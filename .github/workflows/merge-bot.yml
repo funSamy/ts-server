@@ -1,30 +1,28 @@
-name: Automerge PRs
+name: Auto Merge Pull Requests
 
 on:
-  pull_request:
-    types:
-      - synchronize
-      - opened
-      - edited
-      - ready_for_review
-      - review_requested
-  status:
-
-permissions:
-  contents: write
+  check_suite:
+    types: [completed]
 
 jobs:
-  automerge:
+  auto-merge:
+    if: >
+      github.event.check_suite.conclusion == 'success' &&
+      github.event.check_suite.pull_requests != null &&
+      github.event.check_suite.pull_requests[0].base.ref == 'main'
     runs-on: ubuntu-latest
-    if: github.event.state == 'success'
     steps:
-      - name: Integration check
-        uses: squalrus/merge-bot@v0.4.5
+      - name: Auto-merge pull request
+        uses: actions/github-script@v6
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          test: true
-          reviewers: true
-          checks_enabled: true
-          blocking_labels: do not merge
-          method: squash
-          delete_source_branch: true
+          script: |
+            const pullRequest = context.payload.check_suite.pull_requests[0];
+            const { owner, repo } = context.repo;
+            const pull_number = pullRequest.number;
+
+            await github.pulls.merge({
+              owner,
+              repo,
+              pull_number,
+              merge_method: 'squash', // You can use 'merge', 'squash', or 'rebase'
+            });
