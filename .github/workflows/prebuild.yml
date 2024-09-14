@@ -13,6 +13,11 @@ on:
         type: string
         required: true
         default: "Dockerfile.dev"
+      push_registry:
+        description: "Push the container to the container registry"
+        type: boolean
+        required: false
+        default: false
       
   pull_request:
     branches: main
@@ -40,6 +45,7 @@ env:
   DOCKERFILE: ${{ inputs.dockerfile || 'Dockerfile.dev' }}
   COMPOSE_FILE: ${{ inputs.compose_file || 'docker-compose.dev.yml' }}
   GH_TK: ${{ secrets.GITHUB_TOKEN }}
+  PS_RG: ${{ inputs.push_registry || false }}
 
 jobs:
   prebuild:
@@ -81,13 +87,13 @@ jobs:
         with:
           file: ${{ env.DOCKERFILE }}
           sbom: true
-          push: true
+          push: ${{ env.PS_RG }}
           tags: |
             ghcr.io/${{ env.GH_RP }}:${{ github.sha }}
             ghcr.io/${{ env.GH_RP }}:${{ steps.bump_version.outputs.new_tag }}
             ghcr.io/${{ env.GH_RP }}:dev-latest
           cache-from: type=registry,ref=ghcr.io/${{ env.GH_RP }}:buildcache
-          cache-to: type=registry,ref=ghcr.io/${{ env.GH_RP }}:buildcache,mode=max
+          cache-to: type=registry,ref=ghcr.io/${{ env.GH_RP }}:buildcache,mode=min
 
       - name: Cleanup
         run: |
