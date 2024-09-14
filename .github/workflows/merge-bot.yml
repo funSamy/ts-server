@@ -15,9 +15,12 @@ jobs:
     env:
       CH_ST: ${{ toJson(github.event.check_suite) }}
     steps:
-      - name: View content of GitHub Check Suite event
-        run: echo ${{ env.CH_ST }}
-        
+    - name: Auto-merge Pull Request
+      uses: actions/github-script@v6
+      with:
+        script: |
+          // Merge script
+          console.log("MERGING THE PULL REQUEST, NICEEEEEEEEEEEEEEE")
       # - name: Auto-merge pull request
       #   uses: actions/github-script@v6
       #   with:
