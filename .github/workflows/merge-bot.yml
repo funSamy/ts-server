@@ -12,8 +12,6 @@ jobs:
       github.event.check_suite.pull_requests[0].base.ref == 'main'
     runs-on: ubuntu-latest
     steps:
-      - name: Prebiuild and push
-        uses: ${{ github.repo }}/.github/workflows/prebuild.yml
       - name: Auto-merge pull request
         uses: actions/github-script@v6
         with:
@@ -28,3 +26,5 @@ jobs:
               pull_number,
               merge_method: 'squash', // You can use 'merge', 'squash', or 'rebase'
             });
+      - name: Prebuild and push
+        uses: ${{ github.repo }}/.github/workflows/prebuild.yml
