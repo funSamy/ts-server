@@ -1,18 +1,23 @@
 name: Dev Containers Prebuild
 
 on:
-  push:
-    branches-ignore: main
-    paths:
-      - "docker-compose.dev.yml"
-      - "Dockerfile.dev"
-      - "package*.json"
-      - .github/workflows/prebuild.yml
+  workflow_call:
+    inputs:
+      compose_file:
+        description: "The path to docker compose file"
+        type: string
+        required: true
+        default: "docker-compose.dev.yml"
+      dockerfile:
+        description: "The dockerfile path"
+        type: string
+        required: true
+        default: "Dockerfile.dev"
+      
   pull_request:
     branches: main
     paths:
       - "package*.json"
-      - .github/workflows/*.yml
   workflow_dispatch:
     inputs:
       compose_file:
@@ -39,8 +44,6 @@ env:
 jobs:
   prebuild:
     runs-on: ubuntu-latest
-    if: |
-      github.ref_name != 'main' && github.event_name == 'push' || github.ref_name == 'main' && github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Set Repository name
         run: echo "GH_RP=${GITHUB_REPOSITORY@L}" >> "${GITHUB_ENV}"
@@ -90,3 +93,4 @@ jobs:
         run: |
           docker system prune -a -f
           docker builder prune -a -f
+          echo 'SUCCESS=true' >> $GITHUB_OUTPUT
