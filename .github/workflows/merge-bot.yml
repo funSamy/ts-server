@@ -1,22 +1,26 @@
 name: Auto Merge Pull Requests
 
 on:
-  workflow_dispatch:
-  check_suite:
-    types: [completed]
+  pull_request:
+    types:
+      - labeled
+      - opened
+      - reopened
+      - synchronize
 
 jobs:
   auto-merge:
-    # if: >
-    #   github.event.check_suite.conclusion == 'success' &&
-    #   github.event.check_suite.pull_requests != null &&
-    #   github.event.check_suite.pull_requests[0].base.ref == 'main'
     runs-on: ubuntu-latest
-    env:
-      CH_ST: ${{ toJson(github.event.check_suite) }}
+    permissions:
+      pull-requests: write
+      contents: read
     steps:
-      - name: View content of GitHub Check Suite event
-        run: echo ${{ env.CH_ST }}
+    - name: Auto-merge Pull Request
+      uses: actions/github-script@v6
+      with:
+        script: |
+          // Merge script
+          console.log("MERGING THE PULL REQUEST")
       # - name: Auto-merge pull request
       #   uses: actions/github-script@v6
       #   with:
