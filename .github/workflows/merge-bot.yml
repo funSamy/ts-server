@@ -27,4 +27,4 @@ jobs:
               merge_method: 'squash', // You can use 'merge', 'squash', or 'rebase'
             });
       - name: Prebuild and push
-        uses: ${{ github.repo }}/.github/workflows/prebuild.yml
+        uses: ${{ github.repo }}/.github/workflows/prebuild.yml@main
