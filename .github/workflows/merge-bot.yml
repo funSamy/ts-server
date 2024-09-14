@@ -15,12 +15,53 @@ jobs:
       pull-requests: write
       contents: read
     steps:
-    - name: Auto-merge Pull Request
-      uses: actions/github-script@v6
-      with:
-        script: |
-          // Merge script
-          console.log("MERGING THE PULL REQUEST")
+      - name: Wait for Checks to Complete
+        id: wait-for-checks
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const { owner, repo } = context.repo;
+            let pr;
+
+            // Poll for the PR's mergeable status
+            for (let i = 0; i < 10; i++) {
+              pr = await github.pulls.get({
+                owner,
+                repo,
+                pull_number: prNumber,
+              });
+
+              if (pr.data.mergeable_state === 'clean') {
+                break;
+              } else if (pr.data.mergeable_state === 'dirty' || pr.data.mergeable_state === 'unknown') {
+                core.setFailed('Pull request is not mergeable.');
+                return;
+              }
+
+              // Wait for a few seconds before retrying
+              await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+
+            if (pr.data.mergeable_state !== 'clean') {
+              core.setFailed('Timed out waiting for pull request to become mergeable.');
+            }
+
+      - name: Auto-merge Pull Request
+        if: steps.wait-for-checks.outcome == 'success'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+            const { owner, repo } = context.repo;
+
+            await github.pulls.merge({
+              owner,
+              repo,
+              pull_number: prNumber,
+              merge_method: 'merge', // Change to 'squash' or 'rebase' if desired
+            });
+
       # - name: Auto-merge pull request
       #   uses: actions/github-script@v6
       #   with:
