@@ -6,12 +6,12 @@ on:
 jobs:
   auto-assign:
     runs-on: ubuntu-latest
+    if: ${{ contains(github.actor, '[bot]') == false }}
     permissions: 
       pull-requests: write
     steps:
     - name: 'Auto-assign issue'
       uses: pozil/auto-assign-issue@v2
-      if: ${{ contains(github.actor, '[bot]') == false }}
       with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           assignees: ${{ github.actor }}
