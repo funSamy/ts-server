@@ -1,0 +1,26 @@
+ARG _NODE_VERSION=21.7.1
+
+FROM node:${_NODE_VERSION}-alpine AS base
+
+WORKDIR /usr/src/ts_devcontainer
+
+COPY package*.json .
+
+# Install dependecies and cache them.
+RUN --mount=type=cache,target=/root/.npm \
+    npm install
+
+FROM base AS source
+
+COPY . .
+
+FROM base AS git
+RUN apk update && apk add bash
+# Install git
+RUN apk add --no-cache git && \
+    git --version
+
+
+ENTRYPOINT [ "npm", "run", "start:dev" ]
+
+EXPOSE 3000:3000

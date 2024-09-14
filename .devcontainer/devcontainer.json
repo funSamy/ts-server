@@ -1,0 +1,29 @@
+{
+  "name": "tenantsphere-devcontainer",
+  "dockerComposeFile": "../docker-compose-dev.yml",
+  "service": "ts-devcontainer",
+  "workspaceFolder": "/usr/src/ts_devcontainer",
+  // "build": {
+  //   "dockerfile": "../Dockerfile.dev"
+  // },
+  "forwardPorts": [3000, 3001],
+  "portsAttributes": {
+    "3000": {
+      "label": "Tenantsphere Server Port",
+      "onAutoForward": "notify"
+    },
+    "3001": {
+      "label": "Mongo-express Port",
+      "onAutoForward": "notify"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.vscode-typescript-language-features",
+        "esbenp.prettier-vscode",
+        "rangav.vscode-thunder-client"
+      ]
+    }
+  }
+}
