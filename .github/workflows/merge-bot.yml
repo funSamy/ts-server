@@ -17,6 +17,7 @@ jobs:
     steps:
       - name: View content of GitHub Check Suite event
         run: echo ${{ env.CH_ST }}
+        
       # - name: Auto-merge pull request
       #   uses: actions/github-script@v6
       #   with:
