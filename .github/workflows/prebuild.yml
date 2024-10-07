@@ -83,7 +83,7 @@ jobs:
           password: ${{ env.GH_TK }}
 
       - name: Build and export
-        uses: docker/build-push-action@v6.7.0
+        uses: docker/build-push-action@v6.9.0
         with:
           file: ${{ env.DOCKERFILE }}
           sbom: true
